@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"html/template"
 	"io/ioutil"
 	"net/http"
@@ -17,7 +18,7 @@ type User struct {
 	Name    string
 	Age     int
 	Email   string `gorm:"type:varchar(100);unique_index"`
-	Hobbies []Hobby
+	Hobbies []*Hobby
 	Avatar  string
 }
 
@@ -31,6 +32,12 @@ func ListUsers(db *gorm.DB) ([]*User, error) {
 	users := []*User{}
 	result := db.Find(&users)
 	return users, result.Error
+}
+
+func GetSingleUser(db *gorm.DB, userID uint) (*User, error) {
+	user := &User{}
+	res := db.Preload("Hobbies").First(&user, userID)
+	return user, res.Error
 }
 
 func UpdateUserAvatar(db *gorm.DB, userID uint, avatar string) error {
@@ -74,7 +81,9 @@ func AddNewUser(db *gorm.DB, name string, age int, email string, hobbies []strin
 
 func main() {
 	// connecting to sqlite database
-	db, err := gorm.Open(sqlite.Open("database_gorm.sqlite3"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("database_gorm.sqlite3"), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		panic(fmt.Sprintf("not able to connect to database: %s", err.Error()))
 	}
@@ -88,8 +97,8 @@ func main() {
 		panic(fmt.Sprintf("not able to create a table %s", err.Error()))
 	}
 
-	//http.Handle("/images/",
-	//	http.StripPrefix("/images/", http.FileServer(http.Dir("images"))))
+	http.Handle("/assets/",
+		http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 
 	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		users, err := ListUsers(db)
@@ -180,7 +189,40 @@ func main() {
 			return
 		}
 
-		http.Redirect(w, r, "/register", http.StatusTemporaryRedirect)
+		http.Redirect(w, r, fmt.Sprintf("/user-page?userID=%d", userID), http.StatusSeeOther)
+	})
+
+	http.HandleFunc("/user-page", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Redirect(w, r, "/register", http.StatusTemporaryRedirect)
+			return
+		}
+
+		// extract the userID from query string
+		userIDStr := r.URL.Query().Get("userID")
+		// convert from string to int
+		userID, err := strconv.Atoi(userIDStr)
+		if err != nil {
+			http.Error(w, "Bad request", http.StatusBadRequest)
+			return
+		}
+
+		// find the user
+		user, err := GetSingleUser(db, uint(userID))
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		// render the template
+		indexTmpl := template.Must(template.ParseFiles("templates/userPage.gohtml"))
+		w.Header().Set("Content-Type", "text/html")
+
+		err = indexTmpl.Execute(w, user)
+		if err != nil {
+			fmt.Println(err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
 	})
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
