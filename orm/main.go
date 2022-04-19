@@ -40,6 +40,28 @@ func GetSingleUser(db *gorm.DB, userID uint) (*User, error) {
 	return user, res.Error
 }
 
+func ListSimilarUsersByHobby(db *gorm.DB, userID uint) ([]*User, error) {
+	user := &User{}
+	res := db.Preload("Hobbies").First(&user, userID)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	var hobbiesStr []string
+	for _, hobby := range user.Hobbies {
+		hobbiesStr = append(hobbiesStr, fmt.Sprintf(`'%s'`, hobby.Name))
+	}
+
+	users := []*User{}
+
+	res = db.Raw(fmt.Sprintf(`SELECT users.*, h.name as hobby_name FROM Users
+         INNER JOIN hobbies h on users.id = h.user_id
+         WHERE hobby_name in (%s) AND users.id != ?
+         group by users.id`, strings.Join(hobbiesStr, ",")), userID).Scan(&users)
+
+	return users, res.Error
+}
+
 func UpdateUserAvatar(db *gorm.DB, userID uint, avatar string) error {
 	user := &User{}
 	res := db.First(&user, userID)
@@ -207,6 +229,11 @@ func main() {
 			return
 		}
 
+		similar, _ := ListSimilarUsersByHobby(db, uint(userID))
+		for _, u := range similar {
+			fmt.Println(u.Name)
+		}
+
 		// find the user
 		user, err := GetSingleUser(db, uint(userID))
 		if err != nil {
@@ -223,6 +250,16 @@ func main() {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
+	})
+
+	http.HandleFunc("/my-match", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Redirect(w, r, "/user-page", http.StatusTemporaryRedirect)
+			return
+		}
+
+		//userHobby := GetUserHobby(db, string(Hobbies))
+
 	})
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
