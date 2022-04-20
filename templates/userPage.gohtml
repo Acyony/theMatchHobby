@@ -8,8 +8,10 @@
     <title>User Area</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="/assets/CSS/style.css">
+
 </head>
-<body>
+<body class="body-register-container">
 <section class="container mt-4 margin-auto">
     <ul class="nav justify-content-end">
         <li class="nav-item">
@@ -46,9 +48,12 @@
                 <li class="list-group-item">Age: {{ .Age }} years</li>
             {{ end }}
 
-            {{ range .Hobbies }}
-                <li class="list-group-item">Hobby: {{ .Name }}</li>
-            {{ end }}
+            <li class="list-group-item">Hobby:
+                {{ range $index, $hobby := .Hobbies }}
+                    {{- if gt $index  0}}, {{end}}
+                    {{- $hobby.Name }}
+                {{- end }}
+            </li>
         </ul>
 
     </div>
