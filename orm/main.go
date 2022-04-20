@@ -258,6 +258,10 @@ func main() {
 			return
 		}
 
+		// render the template
+		//indexTmpl := template.Must(template.ParseFiles("templates/matchPage.gohtml"))
+		//w.Header()
+
 		//userHobby := GetUserHobby(db, string(Hobbies))
 
 	})
