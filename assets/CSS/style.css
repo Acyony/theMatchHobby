@@ -1,3 +1,15 @@
 body.body-register-container {
-    background: lightpink!important;
+    background: #e0e0e0!important;
+}
+
+.register-wrap, .userPage-wrap {
+    border-radius: 50px;
+    background: #e0e0e0;
+    box-shadow:  20px 20px 60px #bebebe,
+    -20px -20px 60px #ffffff;
+}
+
+.userPage-wrap {
+    width: 35rem;
+    height: 35rem;
 }
