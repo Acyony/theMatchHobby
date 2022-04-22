@@ -1,3 +1,22 @@
 body.body-register-container {
-    background: lightpink!important;
+    background: #e0e0e0!important;
+}
+
+.register-wrap, .userPage-wrap {
+    border-radius: 50px;
+    background: #e0e0e0;
+    box-shadow:  20px 20px 60px #bebebe,
+    -20px -20px 60px #ffffff;
+}
+
+.userPage-wrap {
+    width: 25rem;
+    height: 25rem;
+    margin: 2rem 0 0 2rem;
+}
+
+.users-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem 10px;
 }

@@ -59,6 +59,15 @@ func ListSimilarUsersByHobby(db *gorm.DB, userID uint) ([]*User, error) {
          WHERE hobby_name in (%s) AND users.id != ?
          group by users.id`, strings.Join(hobbiesStr, ",")), userID).Scan(&users)
 
+	for _, user := range users {
+		var hobbies []*Hobby
+		res := db.Raw("SELECT * FROM `hobbies` WHERE `hobbies`.`user_id` = ? AND `hobbies`.`deleted_at` IS NULL", user.ID).Scan(&hobbies)
+		if res.Error != nil {
+			return nil, res.Error
+		}
+		user.Hobbies = hobbies
+	}
+
 	return users, res.Error
 }
 
@@ -253,16 +262,39 @@ func main() {
 	})
 
 	http.HandleFunc("/my-match", func(w http.ResponseWriter, r *http.Request) {
+		// extract the userID from query string
+		userIDStr := r.URL.Query().Get("userID")
+		// convert from string to int
+		userID, err := strconv.Atoi(userIDStr)
+		if err != nil {
+			http.Error(w, "Bad request", http.StatusBadRequest)
+			return
+		}
+
 		if r.Method != "GET" {
-			http.Redirect(w, r, "/user-page", http.StatusTemporaryRedirect)
+			http.Redirect(w, r, fmt.Sprintf("/user-page?userID=%d", userID), http.StatusTemporaryRedirect)
+			return
+		}
+
+		// find the user
+		users, err := ListSimilarUsersByHobby(db, uint(userID))
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
 		// render the template
-		//indexTmpl := template.Must(template.ParseFiles("templates/matchPage.gohtml"))
-		//w.Header()
-
-		//userHobby := GetUserHobby(db, string(Hobbies))
+		indexTmpl := template.Must(template.ParseFiles("templates/matchPage.gohtml"))
+		w.Header().Set("Content-Type", "text/html")
+		err = indexTmpl.Execute(w, map[string]interface{}{
+			"UserID": userID,
+			"Users":  users,
+		})
+		if err != nil {
+			fmt.Println(err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
 
 	})
 
