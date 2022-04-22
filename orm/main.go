@@ -191,6 +191,8 @@ func main() {
 			ext = "jpg"
 		case "image/png":
 			ext = "png"
+		case "image/webp":
+			ext = "webp"
 		default:
 			http.Error(w, "Bad request", http.StatusBadRequest)
 			return
