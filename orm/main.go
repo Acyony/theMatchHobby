@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -15,11 +16,12 @@ import (
 
 type User struct {
 	gorm.Model
-	Name    string
-	Age     int
-	Email   string `gorm:"type:varchar(100);unique_index"`
-	Hobbies []*Hobby
-	Avatar  string
+	Name     string
+	Age      int
+	Email    string `gorm:"type:varchar(100);unique_index"`
+	Password string
+	Hobbies  []*Hobby
+	Avatar   string
 }
 
 type Hobby struct {
@@ -83,19 +85,25 @@ func UpdateUserAvatar(db *gorm.DB, userID uint, avatar string) error {
 	return res.Error
 }
 
-func AddNewUser(db *gorm.DB, name string, age int, email string, hobbies []string) (uint, error) {
+func AddNewUser(db *gorm.DB, name string, age int, email string, password string, hobbies []string) (uint, error) {
+	var err error
+
 	user := User{
 		Name:  name,
 		Age:   age,
 		Email: email,
 	}
-	result := db.Create(&user)
 
+	pass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return 0, err
+	}
+	user.Password = string(pass)
+	result := db.Create(&user)
 	if result.Error != nil {
 		return 0, result.Error
 	}
 
-	var err error
 	for _, hobby := range hobbies {
 		h := Hobby{
 			UserID: user.ID,
@@ -106,7 +114,6 @@ func AddNewUser(db *gorm.DB, name string, age int, email string, hobbies []strin
 			err = res.Error
 		}
 	}
-
 	return user.ID, err
 }
 
@@ -153,6 +160,7 @@ func main() {
 		name := r.FormValue("Name")
 		ageStr := r.FormValue("Age")
 		email := r.FormValue("Email")
+		password := r.FormValue("Password")
 		hobbiesStr := r.FormValue("Hobbies")
 
 		age, err := strconv.Atoi(ageStr)
@@ -177,7 +185,7 @@ func main() {
 			return
 		}
 
-		userID, err := AddNewUser(db, name, age, email, hobbies)
+		userID, err := AddNewUser(db, name, age, email, password, hobbies)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
@@ -191,6 +199,8 @@ func main() {
 			ext = "jpg"
 		case "image/png":
 			ext = "png"
+		case "image/webp":
+			ext = "webp"
 		default:
 			http.Error(w, "Bad request", http.StatusBadRequest)
 			return
