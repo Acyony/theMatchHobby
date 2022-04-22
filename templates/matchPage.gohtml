@@ -18,44 +18,49 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="/my-match?userID={{.ID}}">My Match</a>
+            <a class="nav-link" href="/my-match?userID={{.UserID}}">My Match</a>
         </li>
 
     </ul>
-    <div class="userPage-wrap">
-        <div class="userPage-div-style container d-flex flex-column align-items-center ">
-            <picture class="" style="margin-top: 6rem;">
-                {{if .Avatar}}
-                    <img src="/assets/uploadImage/{{.Avatar}}" alt="User Avatar" width="80">
-                {{else}}
-                    <img src="/assets/uploadImage/generic-user.gif" alt="User Avatar" width="80">
-                {{end}}
-            </picture>
+    <div class="users-container">
+        {{ range .Users }}
+            <div class="userPage-wrap">
+                <div class="userPage-div-style container d-flex flex-column align-items-center ">
+                    <picture class="" style="margin-top: 6rem;">
+                        {{if .Avatar}}
+                            <img src="/assets/uploadImage/{{.Avatar}}" alt="User Avatar" width="80">
+                        {{else}}
+                            <img src="/assets/uploadImage/generic-user.gif" alt="User Avatar" width="80">
+                        {{end}}
+                    </picture>
 
-            <div class="card" >
 
-                <ul class="list-group list-group-flush">
-                    {{ if .Name}}
-                        <li class="list-group-item">Name: {{ .Name }}</li>
-                    {{ end }}
+                    <div class="card">
 
-                    {{ if .Email}}
-                        <li class="list-group-item">Email: {{ .Email }}</li>
-                    {{ end }}
+                        <ul class="list-group list-group-flush">
+                            {{ if .Name}}
+                                <li class="list-group-item">Name: {{ .Name }}</li>
+                            {{ end }}
 
-                    {{ if .Age}}
-                        <li class="list-group-item">Age: {{ .Age }} years</li>
-                    {{ end }}
+                            {{ if .Email}}
+                                <li class="list-group-item">Email: {{ .Email }}</li>
+                            {{ end }}
 
-                    <li class="list-group-item">Hobby:
-                        {{ range $index, $hobby := .Hobbies }}
-                            {{- if gt $index  0}}, {{end}}
-                            {{- $hobby.Name }}
-                        {{- end }}
-                    </li>
-                </ul>
+                            {{ if .Age}}
+                                <li class="list-group-item">Age: {{ .Age }} years</li>
+                            {{ end }}
+
+                            <li class="list-group-item">Hobby:
+                                {{ range $index, $hobby := .Hobbies }}
+                                    {{- if gt $index  0}}, {{end}}
+                                    {{- $hobby.Name }}
+                                {{- end }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-        </div>
+        {{end}}
     </div>
 </section>
 </body>

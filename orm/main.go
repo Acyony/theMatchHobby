@@ -59,6 +59,15 @@ func ListSimilarUsersByHobby(db *gorm.DB, userID uint) ([]*User, error) {
          WHERE hobby_name in (%s) AND users.id != ?
          group by users.id`, strings.Join(hobbiesStr, ",")), userID).Scan(&users)
 
+	for _, user := range users {
+		var hobbies []*Hobby
+		res := db.Raw("SELECT * FROM `hobbies` WHERE `hobbies`.`user_id` = ? AND `hobbies`.`deleted_at` IS NULL", user.ID).Scan(&hobbies)
+		if res.Error != nil {
+			return nil, res.Error
+		}
+		user.Hobbies = hobbies
+	}
+
 	return users, res.Error
 }
 
@@ -268,7 +277,7 @@ func main() {
 		}
 
 		// find the user
-		user, err := GetSingleUser(db, uint(userID))
+		users, err := ListSimilarUsersByHobby(db, uint(userID))
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
@@ -277,7 +286,10 @@ func main() {
 		// render the template
 		indexTmpl := template.Must(template.ParseFiles("templates/matchPage.gohtml"))
 		w.Header().Set("Content-Type", "text/html")
-		err = indexTmpl.Execute(w, user)
+		err = indexTmpl.Execute(w, map[string]interface{}{
+			"UserID": userID,
+			"Users":  users,
+		})
 		if err != nil {
 			fmt.Println(err.Error())
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)

@@ -10,6 +10,13 @@ body.body-register-container {
 }
 
 .userPage-wrap {
-    width: 35rem;
-    height: 35rem;
+    width: 25rem;
+    height: 25rem;
+    margin: 2rem 0 0 2rem;
+}
+
+.users-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem 10px;
 }
