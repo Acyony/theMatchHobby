@@ -23,35 +23,58 @@
         </li>
 
     </ul>
+    <div class="form-wrap">
+        <form method="post" action="/new-user" enctype="multipart/form-data">
+            <div class="input-group mb-3">
+                <input type="file" class="form-control" id="inputGroupFile02" name="Avatar" required>
+            </div>
 
-    <form method="post" action="/new-user" enctype="multipart/form-data">
-        <div class="input-group mb-3">
-            <input type="file" class="form-control" id="inputGroupFile02" name="Avatar" required>
-        </div>
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
+                <input type="text" class="form-control" name="Name" aria-describedby="inputGroup-sizing-sm">
+            </div>
 
-        <div class="input-group input-group-sm mb-3">
-            <span class="input-group-text" id="inputGroup-sizing-sm">Name</span>
-            <input type="text" class="form-control" name="Name" aria-describedby="inputGroup-sizing-sm">
-        </div>
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-sm">Age</span>
+                <input type="number" class="form-control" name="Age" aria-describedby="inputGroup-sizing-sm">
+            </div>
 
-        <div class="input-group input-group-sm mb-3">
-            <span class="input-group-text" id="inputGroup-sizing-sm">Age</span>
-            <input type="number" class="form-control" name="Age" aria-describedby="inputGroup-sizing-sm">
-        </div>
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-sm">Email</span>
+                <input type="email" class="form-control" name="Email" aria-describedby="inputGroup-sizing-sm">
+            </div>
 
-        <div class="input-group input-group-sm mb-3">
-            <span class="input-group-text" id="inputGroup-sizing-sm">Email</span>
-            <input type="email" class="form-control" name="Email" aria-describedby="inputGroup-sizing-sm">
-        </div>
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-sm">Hobbies</span>
+                <input type="text" class="form-control" name="Hobbies" aria-describedby="inputGroup-sizing-sm">
+            </div>
+            <div>
+                <input type="submit" value="Submit" class="btn btn-outline-secondary">
+            </div>
+        </form>
 
-        <div class="input-group input-group-sm mb-3">
-            <span class="input-group-text" id="inputGroup-sizing-sm">Hobbies</span>
-            <input type="text" class="form-control" name="Hobbies" aria-describedby="inputGroup-sizing-sm">
-        </div>
-        <div>
-            <input type="submit" value="Submit" class="btn btn-outline-secondary">
-        </div>
-    </form>
+
+        <form method="post" action="/login" enctype="multipart/form-data">
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-sm">Email</span>
+                <input type="email" class="form-control" name="Email" aria-describedby="inputGroup-sizing-sm">
+            </div>
+
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-sm">Password</span>
+                <input type="password" id="inputPassword6" class="form-control" aria-describedby="passwordHelpInline"
+                       name="Password">
+            </div>
+            <div class="col-auto">
+                <span id="passwordHelpInline" class="form-text">
+                    Must be 8-20 characters long.
+                </span>
+            </div>
+            <div>
+                <input type="submit" value="Submit" class="btn btn-outline-secondary">
+            </div>
+        </form>
+    </div>
 </section>
 </body>
 </html>
