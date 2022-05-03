@@ -16,6 +16,17 @@ body.body-register-container {
     -20px -20px 60px #ffffff;
 }
 
+.register-wrap{
+    height: 61vh;
+    padding: 3rem;
+}
+.nav-style {
+    background: #e0e0e0;
+    box-shadow: 20px 20px 60px #bebebe,
+    -20px -20px 60px #ffffff;
+    padding: 0 8rem 0 0;
+}
+
 .userPage-wrap {
     width: 25rem;
     height: 25rem;
