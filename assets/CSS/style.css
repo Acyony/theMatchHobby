@@ -2,30 +2,21 @@ body.body-register-container {
     background: #e0e0e0 !important;
 }
 
-.form-wrap {
-    display: grid;
-    grid-template-areas: "reg log";
-    column-gap: 2rem;
-    margin-top: 2rem;
-}
-
 .register-wrap, .userPage-wrap {
     border-radius: 50px;
-    background: #e0e0e0;
     box-shadow: 20px 20px 60px #bebebe,
     -20px -20px 60px #ffffff;
-}
-
-.register-wrap{
-    height: 61vh;
     padding: 3rem;
+    height: 100%;
 }
 .nav-style {
     background: #e0e0e0;
     box-shadow: 20px 20px 60px #bebebe,
     -20px -20px 60px #ffffff;
     padding: 0 8rem 0 0;
+    margin-top: 2rem;
 }
+
 
 .userPage-wrap {
     width: 25rem;
@@ -37,4 +28,17 @@ body.body-register-container {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 2rem 10px;
+}
+
+.login, .register {
+    color: blue;
+    font-weight: normal;
+}
+
+.register {
+    margin-bottom: 2rem;
+}
+
+.login {
+    margin-bottom: 3rem;
 }
