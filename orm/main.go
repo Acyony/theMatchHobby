@@ -79,7 +79,6 @@ func UpdateUserAvatar(db *gorm.DB, userID uint, avatar string) error {
 	if res.Error != nil {
 		return res.Error
 	}
-
 	user.Avatar = avatar
 	res = db.Save(user)
 	return res.Error
@@ -94,7 +93,7 @@ func AddNewUser(db *gorm.DB, name string, age int, email string, password string
 		Email: email,
 	}
 
-	pass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	pass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return 0, err
 	}
@@ -233,6 +232,51 @@ func main() {
 		http.Redirect(w, r, fmt.Sprintf("/user-page?userID=%d", userID), http.StatusSeeOther)
 	})
 
+	http.HandleFunc("/loginauth", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("-----==^.^==-----Login auth running------==^.^==------")
+		err := r.ParseForm()
+		if err != nil {
+			fmt.Println(err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		email := r.FormValue("Email")
+		password := r.FormValue("Password")
+		fmt.Println("Email:", email, "Password:", password)
+		//retrieve password from db to compare(hash) with user supplied password's hash
+
+		// Compare the password with the hashed password
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		// Searching user by Email
+		user := User{}
+		tx := db.First(&user, "email = ? AND password = ?", email, string(hashedPassword))
+		if tx.Error != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		// If email and password match, a cookie has to be created
+
+		cookie := &http.Cookie{
+			Name:     "session_cookie",
+			Value:    fmt.Sprintf("%d", user.ID),
+			HttpOnly: true,
+		}
+		// func SetCookie(w ResponseWriter, cookie *Cookie)
+		http.SetCookie(w, cookie)
+
+		// Se não forem iguais, o password não esta correto e pode redirecionar para a mesma pagina ou exibit uma mensagem de erro
+		// Nessem momento o usuario pode ser autenticado!!!
+		//user.
+
+		http.Redirect(w, r, "/user-page", http.StatusTemporaryRedirect)
+	})
+
 	http.HandleFunc("/user-page", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.Redirect(w, r, "/register", http.StatusTemporaryRedirect)
@@ -240,9 +284,14 @@ func main() {
 		}
 
 		// extract the userID from query string
-		userIDStr := r.URL.Query().Get("userID")
+		userIDStr, err := r.Cookie("session_cookie")
+		if err != nil {
+			http.Error(w, "Bad request", http.StatusUnauthorized)
+			return
+		}
+
 		// convert from string to int
-		userID, err := strconv.Atoi(userIDStr)
+		userID, err := strconv.Atoi(userIDStr.Value)
 		if err != nil {
 			http.Error(w, "Bad request", http.StatusBadRequest)
 			return
