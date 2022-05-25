@@ -52,6 +52,18 @@
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Password</span>
+                        <input type="password" id="password" class="form-control"
+                               aria-describedby="passwordHelpInline"
+                               name="Password">
+                    </div>
+                    <div class="col-auto">
+                        <div id="passwordHelpInline" class="form-text">
+                            <p> Must be 8-20 characters long.</p>
+                        </div>
+                    </div>
+
+                    <div class="input-group input-group-sm mb-3">
                         <span class="input-group-text" id="inputGroup-sizing-sm">Hobbies</span>
                         <input type="text" class="form-control" name="Hobbies" aria-describedby="inputGroup-sizing-sm">
                     </div>
@@ -67,28 +79,27 @@
                     <p>Have we met before?</p>
                     <p>Login!</p>
                 </div>
-                <form method="post" action="/login" enctype="multipart/form-data">
+                <form method="post" action="/loginauth">
                     <div class="input-group input-group-sm mb-3">
                         <span class="input-group-text" id="inputGroup-sizing-sm">Email</span>
-                        <input type="email" class="form-control" name="Email" aria-describedby="inputGroup-sizing-sm">
+                        <input type="email" class="form-control" id="email" name="Email"
+                               aria-describedby="inputGroup-sizing-sm">
                     </div>
 
                     <div class="input-group input-group-sm mb-3">
                         <span class="input-group-text" id="inputGroup-sizing-sm">Password</span>
-                        <input type="password" id="inputPassword6" class="form-control"
+                        <input type="password" id="password" class="form-control"
                                aria-describedby="passwordHelpInline"
                                name="Password">
-                    </div>
-                    <div class="col-auto">
-                    <div id="passwordHelpInline" class="form-text">
-                       <p> Must be 8-20 characters long.</p>
-                    </div>
                     </div>
                     <div>
                         <input type="submit" value="Submit" class="btn btn-outline-secondary">
                     </div>
                 </form>
             </div>
+{{/*            {{if .}}*/}}
+{{/*                {{.}}*/}}
+{{/*            {{end}}*/}}
         </div>
     </div>
 
